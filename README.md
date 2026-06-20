@@ -13,7 +13,10 @@ Tymczasem system Windows natywnie **blokuje** możliwość formatowania dysków 
 Aplikacja jest nakładką graficzną wzorowaną na domyślnym narzędziu Windows. Zmienia jednak całą logikę pod spodem:
 1. Wyszukuje tylko dyski wymienne podłączone do komputera (aby uniknąć pomyłkowego formatowania dysków systemowych).
 2. Przy formatowaniu, generuje skrypt dla ukrytego w systemie narzędzia `diskpart`. Czyści on dysk i ustawia prawidłowy schemat partycji **MBR**.
-3. Przy pierwszym uruchomieniu aplikacja pobiera z oficjalnego źródła mały program `fat32format.exe`, przy pomocy którego natychmiast formatuje dysk do FAT32, sprawnie **obchodząc wbudowany limit 32 GB systemu Windows**.
+3. Na koniec korzysta z wbudowanego systemowego narzędzia `format.com`, aby utworzyć czysty system plików FAT32.
+
+> [!WARNING]
+> Ponieważ usunęliśmy zależności od zewnętrznych programów (np. fat32format.exe), ta wersja jest w 100% natywna, bezpieczna i nie wymaga internetu. Pociąga to jednak za sobą wbudowane w Windows ograniczenie — systemowe narzędzie `format.com` pozwala na formatowanie do FAT32 jedynie dysków o rozmiarze **do 32 GB**. Dyski większe mogą wyrzucić błąd "Wolumin jest zbyt duży".
 
 ## Wymagania
 * System Windows (10, 11)
@@ -41,5 +44,4 @@ Wygenerowany program znajdziesz wtedy w ścieżce `bin/Release/net9.0-windows/wi
 ## Technologie
 * C# .NET 9.0 (Windows Forms)
 * System.Management (WMI) do precyzyjnej identyfikacji dysków i przypisywania liter.
-* Diskpart (CLI)
-* [fat32format](http://ridgecrop.co.uk/index.htm?guiformat.htm) (Narzędzie zewnętrzne pobierane w tle).
+* Diskpart oraz systemowy Format (CLI)
