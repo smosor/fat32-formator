@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -85,29 +84,69 @@ namespace Fat32Formator
         {
             if (cmbDrives.SelectedIndex < 0 || !btnStart.Enabled) return;
 
-            string selectedText = cmbDrives.SelectedItem.ToString();
-            if (selectedText == "Brak dysków wymiennych") return;
+            string? selectedText = cmbDrives.SelectedItem?.ToString();
+            if (selectedText == null || selectedText == "Brak dysków wymiennych") return;
 
             string driveLetter = selectedText.Substring(0, 2); // np. "H:"
             
-            var result = MessageBox.Show($"UWAGA: Formatowanie wykasuje wszystkie dane na dysku {driveLetter}\nCzy na pewno chcesz kontynuować?", "Potwierdzenie formatowania", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            // Sprawdzenie rozmiaru dysku
+            long driveSize = 0;
+            try
+            {
+                var driveInfo = new DriveInfo(driveLetter.Substring(0, 1));
+                driveSize = driveInfo.TotalSize;
+            }
+            catch { }
+
+            bool usaNatywneFormatowanie = driveSize > 32L * 1024 * 1024 * 1024; // > 32 GB
+            string metodaInfo = usaNatywneFormatowanie ? " (natywne formatowanie — dysk > 32GB)" : "";
+            
+            var result = MessageBox.Show(
+                $"UWAGA: Formatowanie wykasuje wszystkie dane na dysku {driveLetter}{metodaInfo}\nCzy na pewno chcesz kontynuować?",
+                "Potwierdzenie formatowania",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
             
             if (result == DialogResult.No) return;
 
             btnStart.Enabled = false;
             btnClose.Enabled = false;
-            pbProgress.Style = ProgressBarStyle.Marquee;
+            pbProgress.Style = ProgressBarStyle.Continuous;
+            pbProgress.Value = 0;
+            pbProgress.Maximum = 100;
 
             try
             {
-                // 1. Diskpart clean i MBR
+                // 1. Diskpart — czyszczenie dysku i przygotowanie struktury MBR
+                pbProgress.Style = ProgressBarStyle.Marquee;
                 await RunDiskpartAsync(driveLetter);
 
-                // 2. Format na FAT32
+                // 2. Odczekanie aż Windows rozpozna nową partycję
                 await Task.Delay(2000);
                 
-                await RunSystemFormatAsync(driveLetter, txtVolumeLabel.Text);
+                // 3. Formatowanie na FAT32
+                pbProgress.Style = ProgressBarStyle.Continuous;
+                pbProgress.Value = 0;
 
+                if (usaNatywneFormatowanie)
+                {
+                    // Dysk > 32GB — użycie natywnego formattera (bez zewnętrznych programów)
+                    await Task.Run(() =>
+                    {
+                        Fat32Formatter.Format(driveLetter, txtVolumeLabel.Text, (postep) =>
+                        {
+                            // Aktualizacja progressbar z wątku UI
+                            this.Invoke(() => pbProgress.Value = Math.Min(postep, 100));
+                        });
+                    });
+                }
+                else
+                {
+                    // Dysk ≤ 32GB — systemowe polecenie format (szybkie i niezawodne)
+                    await RunSystemFormatAsync(driveLetter, txtVolumeLabel.Text);
+                }
+
+                pbProgress.Value = 100;
                 MessageBox.Show($"Dysk {driveLetter} został pomyślnie sformatowany do FAT32 (MBR) i jest gotowy dla CDJ 2000!", "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 LoadDrives(); // odśwież widok
             }

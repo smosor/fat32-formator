@@ -17,3 +17,4 @@ Q:\fat32-formator\obj\Debug\net9.0-windows\refint\Fat32Formator.dll
 Q:\fat32-formator\obj\Debug\net9.0-windows\Fat32Formator.pdb
 Q:\fat32-formator\obj\Debug\net9.0-windows\Fat32Formator.genruntimeconfig.cache
 Q:\fat32-formator\obj\Debug\net9.0-windows\ref\Fat32Formator.dll
+Q:\fat32-formator\obj\Debug\net9.0-windows\Fat32Formator.sourcelink.json
