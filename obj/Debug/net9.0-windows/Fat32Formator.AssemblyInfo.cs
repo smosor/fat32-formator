@@ -13,10 +13,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Fat32Formator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6f4fb0b9991fac0c42785ede6625bdf8787f8837")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9966a508b270005d237eef5a845911cf0182cdb0")]
 [assembly: System.Reflection.AssemblyProductAttribute("Fat32Formator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Fat32Formator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Fat32Formator.Tests")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
 [assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]
 

@@ -215,7 +215,7 @@ namespace Fat32Formator
         /// <summary>
         /// Tworzy 512-bajtowy sektor rozruchowy FAT32 zgodny ze specyfikacją Microsoft.
         /// </summary>
-        private static byte[] BuildBootSector(uint totalSectors, int sectorsPerCluster, uint fatSize, string volumeLabel)
+        internal static byte[] BuildBootSector(uint totalSectors, int sectorsPerCluster, uint fatSize, string volumeLabel)
         {
             byte[] bs = new byte[BYTES_PER_SECTOR];
 
@@ -318,7 +318,7 @@ namespace Fat32Formator
         /// <summary>
         /// Tworzy 512-bajtowy sektor FSInfo z informacjami o wolnych klastrach.
         /// </summary>
-        private static byte[] BuildFSInfoSector(uint freeClusters)
+        internal static byte[] BuildFSInfoSector(uint freeClusters)
         {
             byte[] fsi = new byte[BYTES_PER_SECTOR];
 
@@ -353,7 +353,7 @@ namespace Fat32Formator
         /// Tworzy sektor z pierwszymi 3 wpisami tablicy FAT:
         /// [0] = identyfikator nośnika, [1] = koniec łańcucha, [2] = koniec łańcucha (katalog główny)
         /// </summary>
-        private static byte[] BuildFatFirstEntries()
+        internal static byte[] BuildFatFirstEntries()
         {
             byte[] fat = new byte[BYTES_PER_SECTOR];
 
@@ -376,7 +376,7 @@ namespace Fat32Formator
         /// <summary>
         /// Zapisuje wpis katalogowy z etykietą woluminu w danych klastra katalogu głównego.
         /// </summary>
-        private static void WriteVolumeLabelEntry(byte[] clusterData, string volumeLabel)
+        internal static void WriteVolumeLabelEntry(byte[] clusterData, string volumeLabel)
         {
             // Wpis katalogowy FAT32 ma 32 bajty
             // Offset 0x00 (11 bajtów) — nazwa pliku / etykieta
@@ -450,7 +450,7 @@ namespace Fat32Formator
         /// Dobiera liczbę sektorów na klaster na podstawie rozmiaru dysku.
         /// Tabela zgodna ze specyfikacją Microsoft.
         /// </summary>
-        private static int GetSectorsPerCluster(long totalBytes)
+        internal static int GetSectorsPerCluster(long totalBytes)
         {
             long totalMB = totalBytes / (1024 * 1024);
 
@@ -465,7 +465,7 @@ namespace Fat32Formator
         /// Oblicza rozmiar jednej tablicy FAT w sektorach.
         /// Wzór z oficjalnej specyfikacji Microsoft FAT32.
         /// </summary>
-        private static uint CalculateFatSize(uint totalSectors, int sectorsPerCluster)
+        internal static uint CalculateFatSize(uint totalSectors, int sectorsPerCluster)
         {
             // Wzór ze specyfikacji:
             // FATSz = (TotalSectors - ReservedSectors) / (SecPerCluster * (BytsPerSec / 4) + NumFATs) + 1 (zaokrąglenie w górę)
@@ -540,7 +540,7 @@ namespace Fat32Formator
         /// <summary>
         /// Normalizuje etykietę woluminu — wielkie litery, max 11 znaków, dopełnienie spacjami.
         /// </summary>
-        private static string NormalizeVolumeLabel(string label)
+        internal static string NormalizeVolumeLabel(string label)
         {
             if (string.IsNullOrWhiteSpace(label))
                 return "NO NAME    ";
@@ -554,13 +554,13 @@ namespace Fat32Formator
         // Pomocnicze metody zapisu little-endian
         // ==========================================
 
-        private static void WriteUInt16(byte[] buffer, int offset, ushort value)
+        internal static void WriteUInt16(byte[] buffer, int offset, ushort value)
         {
             buffer[offset] = (byte)(value & 0xFF);
             buffer[offset + 1] = (byte)((value >> 8) & 0xFF);
         }
 
-        private static void WriteUInt32(byte[] buffer, int offset, uint value)
+        internal static void WriteUInt32(byte[] buffer, int offset, uint value)
         {
             buffer[offset] = (byte)(value & 0xFF);
             buffer[offset + 1] = (byte)((value >> 8) & 0xFF);
@@ -568,7 +568,7 @@ namespace Fat32Formator
             buffer[offset + 3] = (byte)((value >> 24) & 0xFF);
         }
 
-        private static void WriteString(byte[] buffer, int offset, string value, int length)
+        internal static void WriteString(byte[] buffer, int offset, string value, int length)
         {
             byte[] strBytes = System.Text.Encoding.ASCII.GetBytes(value.PadRight(length));
             Array.Copy(strBytes, 0, buffer, offset, Math.Min(strBytes.Length, length));
